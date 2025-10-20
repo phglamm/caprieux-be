@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Product = require("../models/product");
+const Order = require("../models/order");
 const PayOS = require("@payos/node");
 
 const PAYOS_CLIENT_ID = process.env.PAYOS_CLIENT_ID || "";
@@ -14,11 +15,32 @@ if (!PAYOS_CLIENT_ID || !PAYOS_API_KEY || !PAYOS_CHECKSUM_KEY) {
 }
 
 // Lazy factory to create PayOS client. Handles different export shapes.
-const payOs = new PayOS(
-  process.env.PAYOS_CLIENT_ID,
-  process.env.PAYOS_API_KEY,
-  process.env.PAYOS_CHECKSUM_KEY
-);
+function getPayOSClient() {
+  try {
+    if (typeof PayOS === "function")
+      return new PayOS(PAYOS_CLIENT_ID, PAYOS_API_KEY, PAYOS_CHECKSUM_KEY);
+    if (PayOS && typeof PayOS.default === "function")
+      return new PayOS.default(
+        PAYOS_CLIENT_ID,
+        PAYOS_API_KEY,
+        PAYOS_CHECKSUM_KEY
+      );
+    if (PayOS && typeof PayOS.create === "function")
+      return PayOS.create({
+        clientId: PAYOS_CLIENT_ID,
+        apiKey: PAYOS_API_KEY,
+        checksumKey: PAYOS_CHECKSUM_KEY,
+      });
+  } catch (e) {
+    console.error(
+      "Error creating PayOS client:",
+      e && e.message ? e.message : e
+    );
+  }
+  throw new Error(
+    "Unable to instantiate PayOS client; check @payos/node package version and export shape."
+  );
+}
 
 // POST /api/payments/create-payment-link
 // body: { productId?, product?, quantity?, returnUrl?, cancelUrl? }
@@ -64,10 +86,43 @@ router.post("/create-payment-link", async (req, res) => {
       cancelUrl: body.cancelUrl || `${YOUR_DOMAIN}/cancel.html`,
     };
 
-    const paymentLinkResponse = await payOs.createPaymentLink(paymentRequest);
+    const payOSClient = getPayOSClient();
+    const paymentLinkResponse = await payOSClient.createPaymentLink(
+      paymentRequest
+    );
+
+    // Try to persist an Order record
+    let savedOrder = null;
+    try {
+      const orderDoc = new Order({
+        orderCode: String(paymentRequest.orderCode),
+        productId: product.id || null,
+        productSnapshot: product,
+        quantity: quantity,
+        amount: amount,
+        currency: product.currency || "VND",
+        checkoutUrl: paymentLinkResponse
+          ? paymentLinkResponse.checkoutUrl
+          : null,
+        payosResponse: paymentLinkResponse,
+        returnUrl: paymentRequest.returnUrl,
+        cancelUrl: paymentRequest.cancelUrl,
+        status: "pending",
+      });
+
+      savedOrder = await orderDoc.save();
+    } catch (saveErr) {
+      console.error(
+        "Failed to save order:",
+        saveErr && saveErr.stack ? saveErr.stack : saveErr
+      );
+    }
 
     if (paymentLinkResponse && paymentLinkResponse.checkoutUrl) {
-      return res.json({ checkoutUrl: paymentLinkResponse.checkoutUrl });
+      return res.json({
+        checkoutUrl: paymentLinkResponse.checkoutUrl,
+        orderId: savedOrder ? savedOrder._id : null,
+      });
     }
 
     return res.status(500).json({
