@@ -1,0 +1,27 @@
+[
+  {
+    "id": "AO-HOA-001",
+    "title": "Áo dài vintage — thuê",
+    "shortDescription": "Áo dài nữ vintage, phong cách truyền thống, phù hợp chụp ảnh và sự kiện.",
+    "price": 200000,
+    "currency": "VND",
+    "imageLink": "/images/ao-dai-vintage.jpg",
+    "details": {
+      "basicInfo": "Áo dài nữ, tay dài, hoạ tiết thêu tay ở ngực và gấu áo. Phù hợp cho sự kiện, chụp ảnh, thuê theo ngày.",
+      "sizes": ["S", "M", "L", "XL"],
+      "material": "Lụa tơ tằm tổng hợp, pha cotton nhẹ",
+      "careInstructions": "Giặt tay hoặc giặt nhẹ; phơi nơi râm mát; ủi độ nhiệt thấp.",
+      "accessoriesIncluded": [
+        "Nón lá (tùy chọn)",
+        "Khăn choàng nhỏ",
+        "Ghim cố định áo"
+      ],
+      "measurements": {
+        "S": { "bust": "84cm", "waist": "66cm", "length": "140cm" },
+        "M": { "bust": "88cm", "waist": "70cm", "length": "142cm" },
+        "L": { "bust": "92cm", "waist": "74cm", "length": "144cm" },
+        "XL": { "bust": "96cm", "waist": "78cm", "length": "146cm" }
+      }
+    }
+  }
+]
