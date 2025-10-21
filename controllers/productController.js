@@ -6,7 +6,18 @@ exports.listProducts = async (req, res) => {
     const page = Math.max(1, Number(req.query.page || 1));
     const limit = Math.min(100, Number(req.query.limit || 20));
     const skip = (page - 1) * limit;
-    const products = await Product.find().skip(skip).limit(limit).exec();
+    const searchTerms = req.query.searchTerm;
+    console.log("productController.listProducts searchTerms:", searchTerms);
+    const products = await Product.find({
+      $or: [
+        { title: { $regex: searchTerms, $options: "i" } },
+        { shortDescription: { $regex: searchTerms, $options: "i" } },
+        { details: { $regex: searchTerms, $options: "i" } },
+      ],
+    })
+      .skip(skip)
+      .limit(limit)
+      .exec();
     res.json(products);
   } catch (err) {
     res.status(500).json({ error: "Server error" });

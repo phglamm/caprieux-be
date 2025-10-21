@@ -9,6 +9,7 @@
       "sizes": "L",
       "material": "Lụa tơ tằm tổng hợp, pha cotton nhẹ",
       "careInstructions": "Giặt tay hoặc giặt nhẹ; phơi nơi râm mát; ủi độ nhiệt thấp.",
+      "gender": "Nữ",
       "measurements": {
         "bust": "96cm",
         "waist": "78cm",
@@ -26,6 +27,7 @@
       "sizes": "M",
       "material": "Cotton pha viscose",
       "careInstructions": "Giặt máy nhẹ với túi giặt; phơi ngang để giữ form.",
+      "gender": "Nữ",
       "measurements": {
         "length": "110cm",
         "waist": "72cm",
@@ -43,6 +45,7 @@
       "sizes": "One size",
       "material": "Len acrylic pha wool",
       "careInstructions": "Giặt tay hoặc giặt khô; tránh vắt mạnh.",
+      "gender": "Nam",
       "measurements": {
         "shoulder": "56cm",
         "sleeveLength": "58cm",
@@ -60,6 +63,7 @@
       "sizes": "S,M,L,XL",
       "material": "Polyester pha rayon",
       "careInstructions": "Giặt máy chế độ nhẹ; ủi nhiệt trung bình.",
+      "gender": "Nữ",
       "measurements": {
         "waist": "74cm (size M)",
         "hip": "100cm (size M)",
@@ -72,6 +76,8 @@
     "shortDescription": "Túi xách tay mini phong cách vintage, tiện dụng cho đi chơi và tiệc nhẹ.",
     "price": 260000,
     "imageLink": "/images/tui-xach-tay-mini.jpg",
+    "gender": "Nữ",
+
     "details": {
       "basicInfo": "Túi dạng hộp nhỏ, dây đeo có thể tháo rời, khoá bật kim loại.",
       "sizes": "One size",
