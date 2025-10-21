@@ -57,8 +57,8 @@ exports.createPaymentLink = async (req, res) => {
           price: unitPrice,
         },
       ],
-      returnUrl: `${YOUR_DOMAIN}/order-success/?orderCode=${orderCode}&code=01`,
-      cancelUrl: `${YOUR_DOMAIN}/order-failed/?orderCode=${orderCode}&code=00`,
+      returnUrl: `${YOUR_DOMAIN}/order-success/?orderCode=${orderCode}`,
+      cancelUrl: `${YOUR_DOMAIN}/order-failed/?orderCode=${orderCode}`,
     };
 
     const paymentLinkResponse = await payOs.createPaymentLink(paymentRequest);
@@ -115,7 +115,7 @@ exports.webhook = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    if (code === "01") {
+    if (code === "00") {
       order.status = "paid";
     } else {
       order.status = "cancelled";
