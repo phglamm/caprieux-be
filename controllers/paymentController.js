@@ -10,7 +10,11 @@ exports.createPaymentLink = async (req, res) => {
   try {
     const body = req.body || {};
     let product = null;
-
+    if (!body.address || !body.fullName || !body.phoneNumber) {
+      return res
+        .status(400)
+        .json({ error: "address, fullName, phoneNumber required" });
+    }
     if (body.productId) {
       // Product model stores products with ObjectId _id. Use findById.
       product = await Product.findById(body.productId).lean().exec();
