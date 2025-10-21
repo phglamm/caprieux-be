@@ -7,6 +7,10 @@ exports.listProducts = async (req, res) => {
     const limit = Math.min(100, Number(req.query.limit || 20));
     const skip = (page - 1) * limit;
     const searchTerms = req.query.searchTerm;
+    if (!searchTerms) {
+      const products = await Product.find().skip(skip).limit(limit).exec();
+      return res.json(products);
+    }
     console.log("productController.listProducts searchTerms:", searchTerms);
     const products = await Product.find({
       $or: [
