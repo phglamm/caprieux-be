@@ -106,7 +106,7 @@ exports.createPaymentLink = async (req, res) => {
 
 exports.webhook = async (req, res) => {
   try {
-    const { orderCode, code } = req.body || {};
+    const { orderCode, cancel } = req.body || {};
     if (!orderCode) {
       return res.status(400).json({ error: "orderCode is required" });
     }
@@ -115,7 +115,7 @@ exports.webhook = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    if (code === "00") {
+    if (cancel === false) {
       order.status = "paid";
     } else {
       order.status = "cancelled";
