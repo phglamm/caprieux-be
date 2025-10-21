@@ -15,6 +15,7 @@ var app = express();
 // Mount modular routers (products and payments)
 var productsRouter = require("./routes/products");
 var paymentsRouter = require("./routes/payments");
+var aiRouter = require("./routes/ai");
 
 // Connect to MongoDB (use MONGODB_URI env var or default local DB)
 const MONGODB_URI =
@@ -45,6 +46,7 @@ app.use(express.static(path.join(__dirname, "public")));
 // API routes
 app.use("/api/products", productsRouter);
 app.use("/api/payments", paymentsRouter);
+app.use("/api/ai", aiRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

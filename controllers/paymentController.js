@@ -115,7 +115,7 @@ exports.webhook = async (req, res) => {
       return res.status(404).json({ error: "Order not found" });
     }
 
-    if (code === "00") {
+    if (code === "01") {
       order.status = "paid";
     } else {
       order.status = "cancelled";
