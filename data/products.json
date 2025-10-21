@@ -1,26 +1,86 @@
 [
   {
-    "id": "AO-HOA-001",
-    "title": "Áo dài vintage — thuê",
+    "title": "Áo dài vintage",
     "shortDescription": "Áo dài nữ vintage, phong cách truyền thống, phù hợp chụp ảnh và sự kiện.",
     "price": 200000,
-    "currency": "VND",
     "imageLink": "/images/ao-dai-vintage.jpg",
     "details": {
       "basicInfo": "Áo dài nữ, tay dài, hoạ tiết thêu tay ở ngực và gấu áo. Phù hợp cho sự kiện, chụp ảnh, thuê theo ngày.",
-      "sizes": ["S", "M", "L", "XL"],
+      "sizes": "L",
       "material": "Lụa tơ tằm tổng hợp, pha cotton nhẹ",
       "careInstructions": "Giặt tay hoặc giặt nhẹ; phơi nơi râm mát; ủi độ nhiệt thấp.",
-      "accessoriesIncluded": [
-        "Nón lá (tùy chọn)",
-        "Khăn choàng nhỏ",
-        "Ghim cố định áo"
-      ],
       "measurements": {
-        "S": { "bust": "84cm", "waist": "66cm", "length": "140cm" },
-        "M": { "bust": "88cm", "waist": "70cm", "length": "142cm" },
-        "L": { "bust": "92cm", "waist": "74cm", "length": "144cm" },
-        "XL": { "bust": "96cm", "waist": "78cm", "length": "146cm" }
+        "bust": "96cm",
+        "waist": "78cm",
+        "length": "146cm"
+      }
+    }
+  },
+  {
+    "title": "Đầm xòe hoa nhí",
+    "shortDescription": "Đầm xòe dáng vintage với họa tiết hoa nhí, phù hợp dạo phố và chụp ảnh.",
+    "price": 350000,
+    "imageLink": "/images/dam-xoe-hoa-nhi.jpg",
+    "details": {
+      "basicInfo": "Đầm midi xòe, eo cắt cao, tay ngắn, chất liệu mềm mại thoáng mát.",
+      "sizes": "M",
+      "material": "Cotton pha viscose",
+      "careInstructions": "Giặt máy nhẹ với túi giặt; phơi ngang để giữ form.",
+      "measurements": {
+        "length": "110cm",
+        "waist": "72cm",
+        "hip": "98cm"
+      }
+    }
+  },
+  {
+    "title": "Áo khoác len dệt kim",
+    "shortDescription": "Áo khoác len dệt kim ấm áp, phong cách retro, phù hợp cho mùa lạnh.",
+    "price": 480000,
+    "imageLink": "/images/ao-khoac-len-det-kim.jpg",
+    "details": {
+      "basicInfo": "Áo khoác oversize, cổ tròn, tay raglan, hoạ tiết dệt kim thủ công.",
+      "sizes": "One size",
+      "material": "Len acrylic pha wool",
+      "careInstructions": "Giặt tay hoặc giặt khô; tránh vắt mạnh.",
+      "measurements": {
+        "shoulder": "56cm",
+        "sleeveLength": "58cm",
+        "length": "64cm"
+      }
+    }
+  },
+  {
+    "title": "Quần tây ống suông",
+    "shortDescription": "Quần tây ống suông thanh lịch, phù hợp công sở và sự kiện trang trọng.",
+    "price": 420000,
+    "imageLink": "/images/quan-tay-ong-suong.jpg",
+    "details": {
+      "basicInfo": "Quần cạp cao, ống suông, form đứng, có túi chéo và túi sau.",
+      "sizes": "S,M,L,XL",
+      "material": "Polyester pha rayon",
+      "careInstructions": "Giặt máy chế độ nhẹ; ủi nhiệt trung bình.",
+      "measurements": {
+        "waist": "74cm (size M)",
+        "hip": "100cm (size M)",
+        "inseam": "72cm"
+      }
+    }
+  },
+  {
+    "title": "Túi xách tay mini",
+    "shortDescription": "Túi xách tay mini phong cách vintage, tiện dụng cho đi chơi và tiệc nhẹ.",
+    "price": 260000,
+    "imageLink": "/images/tui-xach-tay-mini.jpg",
+    "details": {
+      "basicInfo": "Túi dạng hộp nhỏ, dây đeo có thể tháo rời, khoá bật kim loại.",
+      "sizes": "One size",
+      "material": "Da PU cao cấp",
+      "careInstructions": "Dùng khăn ẩm lau bề mặt; tránh ngâm nước.",
+      "measurements": {
+        "width": "20cm",
+        "height": "14cm",
+        "depth": "7cm"
       }
     }
   }
