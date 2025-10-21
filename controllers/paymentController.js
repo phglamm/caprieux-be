@@ -48,7 +48,7 @@ exports.createPaymentLink = async (req, res) => {
     const paymentRequest = {
       orderCode: Number(orderCode),
       // amount: amount,
-      amount: 5000,
+      amount: 10000,
       description: `${product.title || "product"}`,
       items: [
         {
