@@ -53,8 +53,8 @@ exports.createPaymentLink = async (req, res) => {
           price: unitPrice,
         },
       ],
-      returnUrl: `${YOUR_DOMAIN}/order-success/${orderCode}`,
-      cancelUrl: `${YOUR_DOMAIN}/order-cancel/${orderCode}`,
+      returnUrl: `${YOUR_DOMAIN}/order-success/?orderCode=${orderCode}&code=01`,
+      cancelUrl: `${YOUR_DOMAIN}/order-cancel/?orderCode=${orderCode}&code=00`,
     };
 
     const paymentLinkResponse = await payOs.createPaymentLink(paymentRequest);
