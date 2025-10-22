@@ -28,8 +28,8 @@ const sendMessage = async (req, res) => {
     // Try multiple models in case one is unavailable
     const models = [
       "deepseek/deepseek-chat-v3-0324:free",
-      "tngtech/deepseek-r1t2-chimera:free",
-      "tencent/hunyuan-a13b-instruct:free",
+      "openai/gpt-5",
+      "openai/chatgpt-4o-latest",
     ];
 
     let aiResponse = null;
