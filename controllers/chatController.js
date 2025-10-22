@@ -29,47 +29,38 @@ const sendMessage = async (req, res) => {
       apiKey: process.env.CHATBOT_KEY,
     });
     // Try multiple models in case one is unavailable
-    const models = [
-      "deepseek/deepseek-chat-v3-0324:free",
-      "meituan/longcat-flash-chat:free",
-      "deepseek/deepseek-chat-v3.1:free",
-    ];
 
     let aiResponse = null;
     let lastError = null;
 
-    for (const model of models) {
-      try {
-        const completion = await openAi.chat.completions.create({
-          model: model,
-          messages: messages,
-        });
+    try {
+      const completion = await openAi.chat.completions.create({
+        model: "meta-llama/llama-3.3-8b-instruct:free",
+        messages: messages,
+      });
 
-        // const response = await axios.post(
-        //   "https://openrouter.ai/api/v1/",
-        //   {
-        //     model: model,
-        //     messages: messages,
-        //     max_tokens: 500,
-        //     temperature: 0.7,
-        //     stream: false,
-        //   },
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${process.env.CHATBOT_KEY}`,
-        //       "X-Title": "Perfume E-commerce Chatbot",
-        //       "Content-Type": "application/json",
-        //     },
-        //   }
-        // );
+      // const response = await axios.post(
+      //   "https://openrouter.ai/api/v1/",
+      //   {
+      //     model: model,
+      //     messages: messages,
+      //     max_tokens: 500,
+      //     temperature: 0.7,
+      //     stream: false,
+      //   },
+      //   {
+      //     headers: {
+      //       Authorization: `Bearer ${process.env.CHATBOT_KEY}`,
+      //       "X-Title": "Perfume E-commerce Chatbot",
+      //       "Content-Type": "application/json",
+      //     },
+      //   }
+      // );
 
-        aiResponse = completion.choices[0].message;
-        break; // Success, exit the loop
-      } catch (modelError) {
-        lastError = modelError;
-        console.log(`Model ${model} failed, trying next...`);
-        continue;
-      }
+      aiResponse = completion.choices[0]?.message?.content;
+    } catch (modelError) {
+      lastError = modelError;
+      console.log(`Model failed, trying next...`);
     }
 
     if (!aiResponse) {
