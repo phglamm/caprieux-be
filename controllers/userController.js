@@ -27,8 +27,8 @@ exports.getUser = async (req, res) => {
 };
 exports.createUser = async (req, res) => {
   try {
-    const { email, password, role } = req.body;
-    const user = new User({ email, password, role });
+    const { username, email, password, role } = req.body;
+    const user = new User({ username, email, password, role });
     await user.save();
     res.status(201).json(user);
   } catch (err) {
@@ -52,4 +52,3 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-

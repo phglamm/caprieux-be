@@ -42,6 +42,22 @@ exports.getProduct = async (req, res) => {
   }
 };
 
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({ error: "Invalid product id" });
+    }
+    const updated = await Product.findByIdAndUpdate(id, req.body, {
+      new: true,
+    }).exec();
+    if (!updated) return res.status(404).json({ error: "Product not found" });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
 exports.createProduct = async (req, res) => {
   try {
     const { title, shortDescription, price, imageLink, details } = req.body;
