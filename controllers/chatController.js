@@ -1,5 +1,5 @@
 const axios = require("axios");
-
+const { OpenAI } = require("openai");
 const sendMessage = async (req, res) => {
   try {
     const { message, conversationHistory = [] } = req.body;
@@ -24,7 +24,10 @@ const sendMessage = async (req, res) => {
         content: message,
       },
     ];
-
+    const openAi = new OpenAI({
+      baseURL: "https://openrouter.ai/api/v1",
+      apiKey: process.env.CHATBOT_KEY,
+    });
     // Try multiple models in case one is unavailable
     const models = [
       "deepseek/deepseek-chat-v3-0324:free",
@@ -37,26 +40,30 @@ const sendMessage = async (req, res) => {
 
     for (const model of models) {
       try {
-        const response = await axios.post(
-          "https://openrouter.ai/api/v1/chat/completions",
-          {
-            model: model,
-            messages: messages,
-            max_tokens: 500,
-            temperature: 0.7,
-            stream: false,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${process.env.CHATBOT_KEY}`,
-              "HTTP-Referer": "http://localhost:5000",
-              "X-Title": "Perfume E-commerce Chatbot",
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const completion = await openAi.chat.completions.create({
+          model: model,
+          messages: messages,
+        });
 
-        aiResponse = response.data.choices[0].message.content;
+        // const response = await axios.post(
+        //   "https://openrouter.ai/api/v1/",
+        //   {
+        //     model: model,
+        //     messages: messages,
+        //     max_tokens: 500,
+        //     temperature: 0.7,
+        //     stream: false,
+        //   },
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${process.env.CHATBOT_KEY}`,
+        //       "X-Title": "Perfume E-commerce Chatbot",
+        //       "Content-Type": "application/json",
+        //     },
+        //   }
+        // );
+
+        aiResponse = completion.choices[0].message;
         break; // Success, exit the loop
       } catch (modelError) {
         lastError = modelError;
