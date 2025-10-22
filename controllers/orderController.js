@@ -2,7 +2,7 @@ const Order = require("../models/order");
 
 exports.listOrder = async (req, res) => {
   try {
-    const orders = await Order.find().exec();
+    const orders = await Order.find().populate("product", "title").exec();
     res.json(orders);
   } catch (error) {
     console.error("Error fetching orders:", error);
