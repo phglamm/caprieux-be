@@ -60,7 +60,8 @@ exports.updateProduct = async (req, res) => {
 
 exports.createProduct = async (req, res) => {
   try {
-    const { title, shortDescription, price, imageLink, details } = req.body;
+    const { title, shortDescription, price, imageLink, details, brand } =
+      req.body;
     console.log("productController.createProduct req.body:", req.body);
     if (!title || !price) {
       return res.status(400).json({ error: "title and price required" });
@@ -72,6 +73,7 @@ exports.createProduct = async (req, res) => {
       price,
       imageLink,
       details,
+      brand,
     });
     await newProduct.save();
     res.status(201).json(newProduct);
