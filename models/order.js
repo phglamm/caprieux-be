@@ -6,12 +6,17 @@ const OrderSchema = new mongoose.Schema(
     fullName: String,
     phoneNumber: String,
     address: String,
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-      required: true,
-    },
-    quantity: { type: Number, default: 1 },
+    items: [
+      {
+        product: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+        quantity: { type: Number, default: 1 },
+        price: { type: Number, required: true },
+      },
+    ],
     amount: { type: Number, required: true },
     status: {
       type: String,
