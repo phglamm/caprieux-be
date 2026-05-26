@@ -41,6 +41,8 @@ const ProductSchema = new mongoose.Schema(
     },
     rentalPrice: { type: Number, required: true },
     depositAmount: { type: Number, default: 0 },
+    minRentalDays: { type: Number, default: 1 },
+    maxRentalDays: { type: Number, default: 30 },
 
     // ─── Stock & Availability ────────────────────────────────────────
     stock: { type: Number, default: 1 },

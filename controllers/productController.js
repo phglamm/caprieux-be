@@ -98,6 +98,8 @@ exports.createProduct = async (req, res) => {
       rentalType,
       rentalPrice,
       depositAmount,
+      minRentalDays,
+      maxRentalDays,
       stock,
       isAvailable,
     } = req.body;
@@ -123,6 +125,8 @@ exports.createProduct = async (req, res) => {
       rentalType,
       rentalPrice,
       depositAmount,
+      minRentalDays,
+      maxRentalDays,
       stock,
       isAvailable,
     });

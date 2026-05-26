@@ -18,6 +18,7 @@ exports.createPaymentLink = async (req, res) => {
 
     let items = [];
     let amount = 0;
+    let totalDepositAmount = 0;
 
     if (Array.isArray(body.items) && body.items.length > 0) {
       // Cart/OrderItems mode
@@ -51,13 +52,33 @@ exports.createPaymentLink = async (req, res) => {
             .status(400)
             .json({ error: "Invalid product price in items" });
         }
+        const deposit = Number(product.depositAmount || 0);
+
+        let rentalDays = 1;
+        let rentalStartDate = item.rentalStartDate || body.rentalStartDate;
+        let rentalEndDate = item.rentalEndDate || body.rentalEndDate;
+
+        if (product.rentalType === "per_day" && rentalStartDate && rentalEndDate) {
+          const start = new Date(rentalStartDate);
+          const end = new Date(rentalEndDate);
+          const diffTime = Math.abs(end - start);
+          rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (rentalDays < 1) rentalDays = 1;
+        }
+
+        let calculatedUnitPrice = product.rentalType === "per_day" ? unitPrice * rentalDays : unitPrice;
+
         items.push({
           name: product.title || "product",
           quantity: quantity,
-          price: unitPrice,
+          price: calculatedUnitPrice,
           productId: product._id ? product._id.toString() : undefined,
+          rentalDays,
+          rentalStartDate,
+          rentalEndDate
         });
-        amount += unitPrice * quantity;
+        amount += calculatedUnitPrice * quantity;
+        totalDepositAmount += deposit * quantity;
       }
     } else {
       // Single product mode (backward compatible)
@@ -80,13 +101,33 @@ exports.createPaymentLink = async (req, res) => {
       const unitPrice = Number(product.rentalPrice || 0);
       if (unitPrice <= 0)
         return res.status(400).json({ error: "Invalid product price" });
+      const deposit = Number(product.depositAmount || 0);
+
+      let rentalDays = 1;
+      let rentalStartDate = body.rentalStartDate;
+      let rentalEndDate = body.rentalEndDate;
+
+      if (product.rentalType === "per_day" && rentalStartDate && rentalEndDate) {
+        const start = new Date(rentalStartDate);
+        const end = new Date(rentalEndDate);
+        const diffTime = Math.abs(end - start);
+        rentalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        if (rentalDays < 1) rentalDays = 1;
+      }
+
+      let calculatedUnitPrice = product.rentalType === "per_day" ? unitPrice * rentalDays : unitPrice;
+
       items.push({
         name: product.title || "product",
         quantity: quantity,
-        price: unitPrice,
+        price: calculatedUnitPrice,
         productId: product._id ? product._id.toString() : undefined,
+        rentalDays,
+        rentalStartDate,
+        rentalEndDate
       });
-      amount = unitPrice * quantity;
+      amount = calculatedUnitPrice * quantity;
+      totalDepositAmount = deposit * quantity;
     }
 
     const YOUR_DOMAIN =
@@ -97,7 +138,7 @@ exports.createPaymentLink = async (req, res) => {
 
     const paymentRequest = {
       orderCode: Number(orderCode),
-      amount: 10000,
+      amount: Math.round(amount + totalDepositAmount),
       description:
         items.length === 1 ? items[0].name : `Order with ${items.length} items`,
       items: items.map((i) => ({
@@ -123,8 +164,14 @@ exports.createPaymentLink = async (req, res) => {
           product: i.productId,
           quantity: i.quantity,
           price: i.price,
+          rentalDays: i.rentalDays,
+          rentalStartDate: i.rentalStartDate,
+          rentalEndDate: i.rentalEndDate,
         })),
         amount: amount,
+        totalDepositAmount: totalDepositAmount,
+        rentalStartDate: body.rentalStartDate || null,
+        rentalEndDate: body.rentalEndDate || null,
         status: "pending",
       });
       savedOrder = await orderDoc.save();

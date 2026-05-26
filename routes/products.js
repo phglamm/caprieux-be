@@ -197,6 +197,14 @@ router.get("/:id", productController.getProduct);
  *                 type: number
  *                 description: "Refundable deposit in VND"
  *                 example: 500000
+ *               minRentalDays:
+ *                 type: integer
+ *                 description: "Minimum rental days"
+ *                 example: 1
+ *               maxRentalDays:
+ *                 type: integer
+ *                 description: "Maximum rental days"
+ *                 example: 30
  *               stock:
  *                 type: integer
  *                 example: 3

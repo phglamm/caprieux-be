@@ -42,6 +42,14 @@ const { authenticateUser } = require("../middleware/authorizedMiddleware");
  *                 type: string
  *                 description: Single product mode — product ID
  *                 example: "6654abc123def456"
+ *               rentalStartDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Global rental start date
+ *               rentalEndDate:
+ *                 type: string
+ *                 format: date-time
+ *                 description: Global rental end date
  *               quantity:
  *                 type: integer
  *                 description: Single product mode — quantity (default 1)
@@ -58,6 +66,12 @@ const { authenticateUser } = require("../middleware/authorizedMiddleware");
  *                     quantity:
  *                       type: integer
  *                       example: 2
+ *                     rentalStartDate:
+ *                       type: string
+ *                       format: date-time
+ *                     rentalEndDate:
+ *                       type: string
+ *                       format: date-time
  *     responses:
  *       200:
  *         description: Payment link created
