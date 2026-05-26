@@ -6,6 +6,8 @@ var logger = require("morgan");
 var cors = require("cors");
 
 var mongoose = require("mongoose");
+var swaggerUi = require("swagger-ui-express");
+var swaggerSpec = require("./config/swagger");
 
 // Load environment variables from .env when present
 require("dotenv").config();
@@ -28,6 +30,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+
+// Swagger documentation
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API routes
 app.use("/api/products", productsRouter);
