@@ -6,24 +6,43 @@ exports.listProducts = async (req, res) => {
     const page = Math.max(1, Number(req.query.page || 1));
     const limit = Math.min(100, Number(req.query.limit || 20));
     const skip = (page - 1) * limit;
-    const searchTerms = req.query.searchTerm;
-    if (!searchTerms) {
-      const products = await Product.find().skip(skip).limit(limit).exec();
-      return res.json(products);
+    const searchTerm = req.query.searchTerm;
+
+    // Build filter object from query params
+    const filter = {};
+    if (req.query.category) filter.category = req.query.category;
+    if (req.query.size) filter.size = req.query.size;
+    if (req.query.color) filter.color = { $regex: req.query.color, $options: "i" };
+    if (req.query.gender) filter.gender = req.query.gender;
+    if (req.query.rentalType) filter.rentalType = req.query.rentalType;
+    if (req.query.isAvailable !== undefined) filter.isAvailable = req.query.isAvailable === "true";
+    if (req.query.condition) filter.condition = req.query.condition;
+
+    if (searchTerm) {
+      filter.$or = [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { shortDescription: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+      ];
     }
-    console.log("productController.listProducts searchTerms:", searchTerms);
-    const products = await Product.find({
-      $or: [
-        { title: { $regex: searchTerms, $options: "i" } },
-        { shortDescription: { $regex: searchTerms, $options: "i" } },
-        { details: { $regex: searchTerms, $options: "i" } },
-      ],
-    })
+
+    const products = await Product.find(filter)
+      .populate("category", "name")
       .skip(skip)
       .limit(limit)
       .exec();
-    res.json(products);
+
+    const total = await Product.countDocuments(filter).exec();
+
+    res.json({
+      products,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (err) {
+    console.error("Error listing products:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
@@ -34,7 +53,7 @@ exports.getProduct = async (req, res) => {
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ error: "Invalid product id" });
     }
-    const p = await Product.findById(id).exec();
+    const p = await Product.findById(id).populate("category", "name").exec();
     if (!p) return res.status(404).json({ error: "Product not found" });
     res.json(p);
   } catch (err) {
@@ -50,35 +69,68 @@ exports.updateProduct = async (req, res) => {
     }
     const updated = await Product.findByIdAndUpdate(id, req.body, {
       new: true,
-    }).exec();
+      runValidators: true,
+    })
+      .populate("category", "name")
+      .exec();
     if (!updated) return res.status(404).json({ error: "Product not found" });
     res.json(updated);
   } catch (err) {
+    console.error("Error updating product:", err);
     res.status(500).json({ error: "Server error" });
   }
 };
 
 exports.createProduct = async (req, res) => {
   try {
-    const { title, shortDescription, price, imageLink, details, brand } =
-      req.body;
-    console.log("productController.createProduct req.body:", req.body);
-    if (!title || !price) {
-      return res.status(400).json({ error: "title and price required" });
+    const {
+      title,
+      shortDescription,
+      description,
+      images,
+      category,
+      size,
+      color,
+      material,
+      gender,
+      brand,
+      condition,
+      rentalType,
+      rentalPrice,
+      depositAmount,
+      stock,
+      isAvailable,
+    } = req.body;
+
+    if (!title || !size || !rentalType || rentalPrice == null) {
+      return res
+        .status(400)
+        .json({ error: "title, size, rentalType, and rentalPrice are required" });
     }
 
     const newProduct = new Product({
       title,
       shortDescription,
-      price,
-      imageLink,
-      details,
+      description,
+      images,
+      category,
+      size,
+      color,
+      material,
+      gender,
       brand,
+      condition,
+      rentalType,
+      rentalPrice,
+      depositAmount,
+      stock,
+      isAvailable,
     });
     await newProduct.save();
+    await newProduct.populate("category", "name");
     res.status(201).json(newProduct);
   } catch (err) {
-    console.error("productController.createProduct error:", err);
+    console.error("Error creating product:", err);
     res.status(500).json({ error: "Server error" });
   }
 };

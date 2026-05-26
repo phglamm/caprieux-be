@@ -4,9 +4,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Caprieux API",
+      title: "Julia API",
       version: "1.0.0",
-      description: "API documentation for the Caprieux e-commerce backend",
+      description: "API documentation for the Julia clothes rental backend",
     },
     servers: [
       {
@@ -28,29 +28,70 @@ const options = {
           type: "object",
           properties: {
             _id: { type: "string", example: "6654abc123def456" },
-            title: { type: "string", example: "Parfum Caprieux" },
+            title: { type: "string", example: "Ao Dai Lua Do" },
             shortDescription: {
               type: "string",
-              example: "A luxurious fragrance",
+              example: "Red silk ao dai for rent",
             },
-            price: { type: "number", example: 500000 },
-            brand: { type: "string", example: "Caprieux" },
-            imageLink: {
+            description: {
               type: "string",
-              example: "https://example.com/image.jpg",
+              example: "Beautiful red silk ao dai, perfect for weddings and Tet celebrations",
             },
-            details: {
+            images: {
+              type: "array",
+              items: { type: "string" },
+              example: ["https://example.com/img1.jpg", "https://example.com/img2.jpg"],
+            },
+            category: {
               type: "object",
-              description: "Additional product details (flexible schema)",
+              properties: {
+                _id: { type: "string", example: "6654abc123def456" },
+                name: { type: "string", example: "Ao Dai" },
+              },
             },
-            createdAt: {
+            size: {
               type: "string",
-              format: "date-time",
+              enum: ["XS", "S", "M", "L", "XL", "XXL", "XXXL", "Free Size"],
+              example: "M",
             },
-            updatedAt: {
+            color: { type: "string", example: "Red" },
+            material: { type: "string", example: "Silk" },
+            gender: {
               type: "string",
-              format: "date-time",
+              enum: ["male", "female", "unisex"],
+              example: "female",
             },
+            brand: { type: "string", example: "Julia" },
+            condition: {
+              type: "string",
+              enum: ["new", "like_new", "good", "fair"],
+              example: "new",
+            },
+            rentalType: {
+              type: "string",
+              enum: ["fixed", "per_day"],
+              example: "fixed",
+            },
+            rentalPrice: { type: "number", example: 350000 },
+            depositAmount: { type: "number", example: 500000 },
+            stock: { type: "integer", example: 3 },
+            isAvailable: { type: "boolean", example: true },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
+          },
+        },
+        Category: {
+          type: "object",
+          properties: {
+            _id: { type: "string", example: "6654abc123def456" },
+            name: { type: "string", example: "Ao Dai" },
+            description: {
+              type: "string",
+              example: "Traditional Vietnamese long dress",
+            },
+            isActive: { type: "boolean", example: true },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
           },
         },
         User: {

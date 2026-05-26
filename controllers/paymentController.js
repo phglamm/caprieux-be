@@ -31,7 +31,7 @@ exports.createPaymentLink = async (req, res) => {
               .json({ error: `Product not found: ${item.productId}` });
         } else if (item.product) {
           product = item.product;
-          if (!product.title || typeof product.price === "undefined") {
+          if (!product.title || typeof product.rentalPrice === "undefined") {
             return res
               .status(400)
               .json({ error: "Invalid product object in items" });
@@ -45,7 +45,7 @@ exports.createPaymentLink = async (req, res) => {
         if (!Number.isInteger(quantity) || quantity < 1) {
           return res.status(400).json({ error: "Invalid quantity in items" });
         }
-        const unitPrice = Number(product.price || 0);
+        const unitPrice = Number(product.rentalPrice || 0);
         if (unitPrice <= 0) {
           return res
             .status(400)
@@ -68,7 +68,7 @@ exports.createPaymentLink = async (req, res) => {
           return res.status(404).json({ error: "Product not found" });
       } else if (body.product) {
         product = body.product;
-        if (!product.title || typeof product.price === "undefined") {
+        if (!product.title || typeof product.rentalPrice === "undefined") {
           return res.status(400).json({ error: "Invalid product object" });
         }
       } else {
@@ -77,7 +77,7 @@ exports.createPaymentLink = async (req, res) => {
       const quantity = Number(body.quantity || 1);
       if (!Number.isInteger(quantity) || quantity < 1)
         return res.status(400).json({ error: "Invalid quantity" });
-      const unitPrice = Number(product.price || 0);
+      const unitPrice = Number(product.rentalPrice || 0);
       if (unitPrice <= 0)
         return res.status(400).json({ error: "Invalid product price" });
       items.push({

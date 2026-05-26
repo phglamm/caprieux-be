@@ -6,14 +6,14 @@ const productController = require("../controllers/productController");
  * @swagger
  * tags:
  *   name: Products
- *   description: Product management
+ *   description: Clothing rental product management
  */
 
 /**
  * @swagger
  * /api/products:
  *   get:
- *     summary: List all products
+ *     summary: List rental products
  *     tags: [Products]
  *     parameters:
  *       - in: query
@@ -27,27 +27,77 @@ const productController = require("../controllers/productController");
  *         schema:
  *           type: integer
  *           default: 20
- *         description: Number of items per page (max 100)
+ *         description: Items per page (max 100)
  *       - in: query
  *         name: searchTerm
  *         schema:
  *           type: string
- *         description: Search by title, shortDescription, or details
+ *         description: Search by title or description
+ *       - in: query
+ *         name: category
+ *         schema:
+ *           type: string
+ *         description: Filter by category ID
+ *       - in: query
+ *         name: size
+ *         schema:
+ *           type: string
+ *           enum: [XS, S, M, L, XL, XXL, XXXL, Free Size]
+ *         description: Filter by size
+ *       - in: query
+ *         name: color
+ *         schema:
+ *           type: string
+ *         description: Filter by color (case-insensitive)
+ *       - in: query
+ *         name: gender
+ *         schema:
+ *           type: string
+ *           enum: [male, female, unisex]
+ *         description: Filter by gender
+ *       - in: query
+ *         name: rentalType
+ *         schema:
+ *           type: string
+ *           enum: [fixed, per_day]
+ *         description: Filter by rental type
+ *       - in: query
+ *         name: condition
+ *         schema:
+ *           type: string
+ *           enum: [new, like_new, good, fair]
+ *         description: Filter by condition
+ *       - in: query
+ *         name: isAvailable
+ *         schema:
+ *           type: boolean
+ *         description: Filter by availability
  *     responses:
  *       200:
- *         description: A list of products
+ *         description: Paginated list of products
  *         content:
  *           application/json:
  *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Product'
+ *               type: object
+ *               properties:
+ *                 products:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Product'
+ *                 page:
+ *                   type: integer
+ *                   example: 1
+ *                 limit:
+ *                   type: integer
+ *                   example: 20
+ *                 total:
+ *                   type: integer
+ *                   example: 50
+ *                 totalPages:
+ *                   type: integer
+ *                   example: 3
  *       500:
  *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
 router.get("/", productController.listProducts);
 
@@ -73,16 +123,8 @@ router.get("/", productController.listProducts);
  *               $ref: '#/components/schemas/Product'
  *       400:
  *         description: Invalid product ID
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       404:
  *         description: Product not found
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
 router.get("/:id", productController.getProduct);
 
@@ -90,7 +132,7 @@ router.get("/:id", productController.getProduct);
  * @swagger
  * /api/products:
  *   post:
- *     summary: Create a new product
+ *     summary: Create a new rental product
  *     tags: [Products]
  *     requestBody:
  *       required: true
@@ -100,26 +142,67 @@ router.get("/:id", productController.getProduct);
  *             type: object
  *             required:
  *               - title
- *               - price
+ *               - size
+ *               - rentalType
+ *               - rentalPrice
  *             properties:
  *               title:
  *                 type: string
- *                 example: "Parfum Caprieux"
+ *                 example: "Ao Dai Lua Do"
  *               shortDescription:
  *                 type: string
- *                 example: "A luxurious fragrance"
- *               price:
- *                 type: number
- *                 example: 500000
+ *                 example: "Red silk ao dai for rent"
+ *               description:
+ *                 type: string
+ *                 example: "Beautiful red silk ao dai, perfect for weddings and Tet celebrations"
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 example: ["https://example.com/img1.jpg", "https://example.com/img2.jpg"]
+ *               category:
+ *                 type: string
+ *                 description: Category ID
+ *                 example: "6654abc123def456"
+ *               size:
+ *                 type: string
+ *                 enum: [XS, S, M, L, XL, XXL, XXXL, Free Size]
+ *                 example: "M"
+ *               color:
+ *                 type: string
+ *                 example: "Red"
+ *               material:
+ *                 type: string
+ *                 example: "Silk"
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, unisex]
+ *                 example: "female"
  *               brand:
  *                 type: string
- *                 example: "Caprieux"
- *               imageLink:
+ *                 example: "Julia"
+ *               condition:
  *                 type: string
- *                 example: "https://example.com/image.jpg"
- *               details:
- *                 type: object
- *                 description: Additional product details
+ *                 enum: [new, like_new, good, fair]
+ *                 example: "new"
+ *               rentalType:
+ *                 type: string
+ *                 enum: [fixed, per_day]
+ *                 example: "fixed"
+ *               rentalPrice:
+ *                 type: number
+ *                 description: "Price in VND (flat fee or per day)"
+ *                 example: 350000
+ *               depositAmount:
+ *                 type: number
+ *                 description: "Refundable deposit in VND"
+ *                 example: 500000
+ *               stock:
+ *                 type: integer
+ *                 example: 3
+ *               isAvailable:
+ *                 type: boolean
+ *                 example: true
  *     responses:
  *       201:
  *         description: Product created successfully
@@ -129,16 +212,8 @@ router.get("/:id", productController.getProduct);
  *               $ref: '#/components/schemas/Product'
  *       400:
  *         description: Missing required fields
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  *       500:
  *         description: Server error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Error'
  */
 router.post("/", productController.createProduct);
 
@@ -197,14 +272,40 @@ router.delete("/:id", productController.deleteProduct);
  *                 type: string
  *               shortDescription:
  *                 type: string
- *               price:
- *                 type: number
+ *               description:
+ *                 type: string
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *               category:
+ *                 type: string
+ *               size:
+ *                 type: string
+ *                 enum: [XS, S, M, L, XL, XXL, XXXL, Free Size]
+ *               color:
+ *                 type: string
+ *               material:
+ *                 type: string
+ *               gender:
+ *                 type: string
+ *                 enum: [male, female, unisex]
  *               brand:
  *                 type: string
- *               imageLink:
+ *               condition:
  *                 type: string
- *               details:
- *                 type: object
+ *                 enum: [new, like_new, good, fair]
+ *               rentalType:
+ *                 type: string
+ *                 enum: [fixed, per_day]
+ *               rentalPrice:
+ *                 type: number
+ *               depositAmount:
+ *                 type: number
+ *               stock:
+ *                 type: integer
+ *               isAvailable:
+ *                 type: boolean
  *     responses:
  *       200:
  *         description: Updated product
