@@ -19,7 +19,7 @@ exports.register = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
-      }
+      },
     );
     res.status(201).json({ token });
   } catch (err) {
@@ -31,7 +31,7 @@ exports.login = async (req, res) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ username }).exec();
-    if (!user || user.password !== password) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid username or password" });
     }
     const token = jwt.sign(
@@ -44,9 +44,9 @@ exports.login = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "1d",
-      }
+      },
     );
-    res.status(200).json({ token });
+    res.status(200).json({ message: "Login successful", token });
   } catch (err) {
     console.error("Error logging in user:", err);
     res.status(500).json({ error: "Internal server error" });
