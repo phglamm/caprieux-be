@@ -1,5 +1,6 @@
 const Product = require("../models/product");
 const Order = require("../models/order");
+const User = require("../models/user");
 const PayOS = require("@payos/node");
 const payOs = new PayOS(
   process.env.PAYOS_CLIENT_ID,
@@ -114,6 +115,7 @@ exports.createPaymentLink = async (req, res) => {
     try {
       const orderDoc = new Order({
         orderCode: orderCode,
+        user: req.user ? req.user.id : null,
         fullName: body.fullName || null,
         phoneNumber: body.phoneNumber || null,
         address: body.address || null,
@@ -166,6 +168,16 @@ exports.webhook = async (req, res) => {
 
     if (cancel === "false") {
       order.status = "paid";
+
+      // Award loyalty points: 1 point per 1,000 VND
+      if (order.user) {
+        const pointsEarned = Math.floor(order.amount / 1000);
+        if (pointsEarned > 0) {
+          await User.findByIdAndUpdate(order.user, {
+            $inc: { points: pointsEarned },
+          });
+        }
+      }
     } else {
       order.status = "cancelled";
     }
