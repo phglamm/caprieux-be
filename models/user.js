@@ -9,6 +9,18 @@ const UserSchema = new mongoose.Schema(
     points: { type: Number, default: 0 },
     createdAt: { type: Date, default: Date.now },
     role: { type: String, enum: ["user", "admin"], default: "user" },
+    // Profile fields
+    fullName: { type: String, default: "" },
+    phone: { type: String, default: "" },
+    dob: { type: Date, default: null },
+    gender: { type: String, enum: ["male", "female", "other", ""], default: "" },
+    address: {
+      street: { type: String, default: "" },
+      ward: { type: String, default: "" },
+      district: { type: String, default: "" },
+      city: { type: String, default: "" },
+      country: { type: String, default: "Vietnam" },
+    },
   },
   {
     timestamps: true,

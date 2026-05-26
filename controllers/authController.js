@@ -11,19 +11,7 @@ exports.register = async (req, res) => {
     }
     const user = new User({ username, email, password });
     await user.save();
-    const token = jwt.sign(
-      {
-        id: user._id,
-        username: user.username,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      },
-    );
-    res.status(201).json({ token });
+    res.status(201).json({ message: "Register successful" });
   } catch (err) {
     console.error("Error registering user:", err);
     res.status(500).json({ error: "Internal server error" });
@@ -42,6 +30,12 @@ exports.login = async (req, res) => {
         username: user.username,
         email: user.email,
         role: user.role,
+        points: user.points,
+        address: user.address,
+        fullName: user.fullName,
+        phone: user.phone,
+        dob: user.dob,
+        gender: user.gender,
       },
       process.env.JWT_SECRET,
       {

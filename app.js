@@ -21,6 +21,7 @@ var orderRouter = require("./routes/order");
 var authRouter = require("./routes/authRouter");
 var vouchersRouter = require("./routes/vouchers");
 var categoriesRouter = require("./routes/categories");
+var usersRouter = require("./routes/users");
 // Connect to MongoDB (use MONGODB_URI env var or default local DB)
 const connectDB = require("./config/database");
 connectDB();
@@ -42,6 +43,7 @@ app.use("/api/orders", orderRouter);
 app.use("/api/auth", authRouter);
 app.use("/api/vouchers", vouchersRouter);
 app.use("/api/categories", categoriesRouter);
+app.use("/api/users", usersRouter);
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
