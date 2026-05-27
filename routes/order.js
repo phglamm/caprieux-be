@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/orderController");
+const { authenticateUser } = require("../middleware/authorizedMiddleware");
 
 /**
  * @swagger
@@ -32,5 +33,6 @@ const orderController = require("../controllers/orderController");
  *               $ref: '#/components/schemas/Error'
  */
 router.get("/", orderController.listOrder);
+router.get("/my-orders", authenticateUser, orderController.getMyOrders);
 
 module.exports = router;

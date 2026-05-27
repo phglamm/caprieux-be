@@ -57,7 +57,7 @@ exports.createPaymentLink = async (req, res) => {
         }
         const deposit = Number(product.depositAmount || 0);
 
-        let rentalDays = 1;
+        let rentalDays = Number(item.rentalDays) || Number(body.rentalDays) || 1;
         let rentalStartDate = item.rentalStartDate || body.rentalStartDate;
         let rentalEndDate = item.rentalEndDate || body.rentalEndDate;
 
@@ -122,7 +122,7 @@ exports.createPaymentLink = async (req, res) => {
         return res.status(400).json({ error: "Invalid product price" });
       const deposit = Number(product.depositAmount || 0);
 
-      let rentalDays = 1;
+      let rentalDays = Number(body.rentalDays) || 1;
       let rentalStartDate = body.rentalStartDate;
       let rentalEndDate = body.rentalEndDate;
 
