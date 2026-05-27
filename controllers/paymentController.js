@@ -1,11 +1,12 @@
 const Product = require("../models/product");
 const Order = require("../models/order");
 const User = require("../models/user");
+const { applyRentalDiscount } = require("./rentalDiscountRuleController");
 const PayOS = require("@payos/node");
 const payOs = new PayOS(
   process.env.PAYOS_CLIENT_ID,
   process.env.PAYOS_API_KEY,
-  process.env.PAYOS_CHECKSUM_KEY
+  process.env.PAYOS_CHECKSUM_KEY,
 );
 exports.createPaymentLink = async (req, res) => {
   try {
@@ -19,6 +20,8 @@ exports.createPaymentLink = async (req, res) => {
     let items = [];
     let amount = 0;
     let totalDepositAmount = 0;
+    let totalDiscountAmount = 0;
+    let appliedDiscountRuleName = "";
 
     if (Array.isArray(body.items) && body.items.length > 0) {
       // Cart/OrderItems mode
@@ -58,7 +61,7 @@ exports.createPaymentLink = async (req, res) => {
         let rentalStartDate = item.rentalStartDate || body.rentalStartDate;
         let rentalEndDate = item.rentalEndDate || body.rentalEndDate;
 
-        if (product.rentalType === "per_day" && rentalStartDate && rentalEndDate) {
+        if (rentalStartDate && rentalEndDate) {
           const start = new Date(rentalStartDate);
           const end = new Date(rentalEndDate);
           const diffTime = Math.abs(end - start);
@@ -66,19 +69,35 @@ exports.createPaymentLink = async (req, res) => {
           if (rentalDays < 1) rentalDays = 1;
         }
 
-        let calculatedUnitPrice = product.rentalType === "per_day" ? unitPrice * rentalDays : unitPrice;
+        let calculatedUnitPrice = unitPrice * rentalDays;
+
+        // Apply rental discount rule
+        let itemDiscount = 0;
+        if (rentalDays > 1) {
+          const discountResult = await applyRentalDiscount(
+            calculatedUnitPrice,
+            rentalDays,
+          );
+          itemDiscount = discountResult.discountAmount;
+          calculatedUnitPrice = discountResult.finalPrice;
+          if (discountResult.ruleName) {
+            appliedDiscountRuleName = discountResult.ruleName;
+          }
+        }
 
         items.push({
           name: product.title || "product",
           quantity: quantity,
           price: calculatedUnitPrice,
+          depositPrice: deposit,
           productId: product._id ? product._id.toString() : undefined,
           rentalDays,
           rentalStartDate,
-          rentalEndDate
+          rentalEndDate,
         });
         amount += calculatedUnitPrice * quantity;
         totalDepositAmount += deposit * quantity;
+        totalDiscountAmount += itemDiscount * quantity;
       }
     } else {
       // Single product mode (backward compatible)
@@ -107,7 +126,7 @@ exports.createPaymentLink = async (req, res) => {
       let rentalStartDate = body.rentalStartDate;
       let rentalEndDate = body.rentalEndDate;
 
-      if (product.rentalType === "per_day" && rentalStartDate && rentalEndDate) {
+      if (rentalStartDate && rentalEndDate) {
         const start = new Date(rentalStartDate);
         const end = new Date(rentalEndDate);
         const diffTime = Math.abs(end - start);
@@ -115,16 +134,30 @@ exports.createPaymentLink = async (req, res) => {
         if (rentalDays < 1) rentalDays = 1;
       }
 
-      let calculatedUnitPrice = product.rentalType === "per_day" ? unitPrice * rentalDays : unitPrice;
+      let calculatedUnitPrice = unitPrice * rentalDays;
+
+      // Apply rental discount rule
+      if (rentalDays > 1) {
+        const discountResult = await applyRentalDiscount(
+          calculatedUnitPrice,
+          rentalDays,
+        );
+        totalDiscountAmount = discountResult.discountAmount * quantity;
+        calculatedUnitPrice = discountResult.finalPrice;
+        if (discountResult.ruleName) {
+          appliedDiscountRuleName = discountResult.ruleName;
+        }
+      }
 
       items.push({
         name: product.title || "product",
         quantity: quantity,
         price: calculatedUnitPrice,
+        depositPrice: deposit,
         productId: product._id ? product._id.toString() : undefined,
         rentalDays,
         rentalStartDate,
-        rentalEndDate
+        rentalEndDate,
       });
       amount = calculatedUnitPrice * quantity;
       totalDepositAmount = deposit * quantity;
@@ -138,13 +171,13 @@ exports.createPaymentLink = async (req, res) => {
 
     const paymentRequest = {
       orderCode: Number(orderCode),
-      amount: Math.round(amount + totalDepositAmount),
+      amount: Math.round(totalDepositAmount),
       description:
         items.length === 1 ? items[0].name : `Order with ${items.length} items`,
       items: items.map((i) => ({
         name: i.name,
         quantity: i.quantity,
-        price: i.price,
+        price: i.depositPrice,
       })),
       returnUrl: `${YOUR_DOMAIN}/order-success`,
       cancelUrl: `${YOUR_DOMAIN}/order-failed`,
@@ -170,6 +203,8 @@ exports.createPaymentLink = async (req, res) => {
         })),
         amount: amount,
         totalDepositAmount: totalDepositAmount,
+        discountAmount: totalDiscountAmount,
+        discountRuleName: appliedDiscountRuleName,
         rentalStartDate: body.rentalStartDate || null,
         rentalEndDate: body.rentalEndDate || null,
         status: "pending",
@@ -178,7 +213,7 @@ exports.createPaymentLink = async (req, res) => {
     } catch (saveErr) {
       console.error(
         "Failed to save order:",
-        saveErr && saveErr.stack ? saveErr.stack : saveErr
+        saveErr && saveErr.stack ? saveErr.stack : saveErr,
       );
     }
 
@@ -196,7 +231,7 @@ exports.createPaymentLink = async (req, res) => {
   } catch (err) {
     console.error(
       "payments.create-payment-link error:",
-      err && err.stack ? err.stack : err
+      err && err.stack ? err.stack : err,
     );
     return res.status(500).json({ error: "Server error" });
   }
@@ -237,7 +272,7 @@ exports.webhook = async (req, res) => {
   } catch (err) {
     console.error(
       "Webhook handling error:",
-      err && err.stack ? err.stack : err
+      err && err.stack ? err.stack : err,
     );
     return res.status(500).json({ error: "Server error" });
   }

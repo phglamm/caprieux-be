@@ -67,12 +67,7 @@ const options = {
               enum: ["new", "like_new", "good", "fair"],
               example: "new",
             },
-            rentalType: {
-              type: "string",
-              enum: ["fixed", "per_day"],
-              example: "fixed",
-            },
-            rentalPrice: { type: "number", example: 350000 },
+            rentalPrice: { type: "number", description: "Price per day in VND", example: 350000 },
             depositAmount: { type: "number", example: 500000 },
             minRentalDays: { type: "integer", example: 1 },
             maxRentalDays: { type: "integer", example: 30 },

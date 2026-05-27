@@ -56,22 +56,17 @@ const productController = require("../controllers/productController");
  *           enum: [male, female, unisex]
  *         description: Filter by gender
  *       - in: query
- *         name: rentalType
- *         schema:
- *           type: string
- *           enum: [fixed, per_day]
- *         description: Filter by rental type
- *       - in: query
- *         name: condition
- *         schema:
- *           type: string
- *           enum: [new, like_new, good, fair]
  *         description: Filter by condition
  *       - in: query
  *         name: isAvailable
  *         schema:
  *           type: boolean
  *         description: Filter by availability
+ *       - in: query
+ *         name: brand
+ *         schema:
+ *           type: string
+ *         description: Filter by brand ID
  *     responses:
  *       200:
  *         description: Paginated list of products
@@ -143,7 +138,6 @@ router.get("/:id", productController.getProduct);
  *             required:
  *               - title
  *               - size
- *               - rentalType
  *               - rentalPrice
  *             properties:
  *               title:
@@ -180,18 +174,15 @@ router.get("/:id", productController.getProduct);
  *                 example: "female"
  *               brand:
  *                 type: string
- *                 example: "Julia"
+ *                 description: Brand ID
+ *                 example: "6654abc123def789"
  *               condition:
  *                 type: string
  *                 enum: [new, like_new, good, fair]
  *                 example: "new"
- *               rentalType:
- *                 type: string
- *                 enum: [fixed, per_day]
- *                 example: "fixed"
  *               rentalPrice:
  *                 type: number
- *                 description: "Price in VND (flat fee or per day)"
+ *                 description: "Price per day in VND"
  *                 example: 350000
  *               depositAmount:
  *                 type: number
@@ -300,12 +291,10 @@ router.delete("/:id", productController.deleteProduct);
  *                 enum: [male, female, unisex]
  *               brand:
  *                 type: string
+ *                 description: Brand ID
  *               condition:
  *                 type: string
  *                 enum: [new, like_new, good, fair]
- *               rentalType:
- *                 type: string
- *                 enum: [fixed, per_day]
  *               rentalPrice:
  *                 type: number
  *               depositAmount:

@@ -11,10 +11,10 @@ exports.listProducts = async (req, res) => {
     // Build filter object from query params
     const filter = {};
     if (req.query.category) filter.category = req.query.category;
+    if (req.query.brand) filter.brand = req.query.brand;
     if (req.query.size) filter.size = req.query.size;
     if (req.query.color) filter.color = { $regex: req.query.color, $options: "i" };
     if (req.query.gender) filter.gender = req.query.gender;
-    if (req.query.rentalType) filter.rentalType = req.query.rentalType;
     if (req.query.isAvailable !== undefined) filter.isAvailable = req.query.isAvailable === "true";
     if (req.query.condition) filter.condition = req.query.condition;
 
@@ -28,6 +28,7 @@ exports.listProducts = async (req, res) => {
 
     const products = await Product.find(filter)
       .populate("category", "name")
+      .populate("brand", "name")
       .skip(skip)
       .limit(limit)
       .exec();
@@ -53,7 +54,7 @@ exports.getProduct = async (req, res) => {
     if (!mongoose.isValidObjectId(id)) {
       return res.status(400).json({ error: "Invalid product id" });
     }
-    const p = await Product.findById(id).populate("category", "name").exec();
+    const p = await Product.findById(id).populate("category", "name").populate("brand", "name").exec();
     if (!p) return res.status(404).json({ error: "Product not found" });
     res.json(p);
   } catch (err) {
@@ -72,6 +73,7 @@ exports.updateProduct = async (req, res) => {
       runValidators: true,
     })
       .populate("category", "name")
+      .populate("brand", "name")
       .exec();
     if (!updated) return res.status(404).json({ error: "Product not found" });
     res.json(updated);
@@ -95,7 +97,6 @@ exports.createProduct = async (req, res) => {
       gender,
       brand,
       condition,
-      rentalType,
       rentalPrice,
       depositAmount,
       minRentalDays,
@@ -104,10 +105,10 @@ exports.createProduct = async (req, res) => {
       isAvailable,
     } = req.body;
 
-    if (!title || !size || !rentalType || rentalPrice == null) {
+    if (!title || !size || rentalPrice == null) {
       return res
         .status(400)
-        .json({ error: "title, size, rentalType, and rentalPrice are required" });
+        .json({ error: "title, size, and rentalPrice are required" });
     }
 
     const newProduct = new Product({
@@ -122,7 +123,6 @@ exports.createProduct = async (req, res) => {
       gender,
       brand,
       condition,
-      rentalType,
       rentalPrice,
       depositAmount,
       minRentalDays,
@@ -132,6 +132,7 @@ exports.createProduct = async (req, res) => {
     });
     await newProduct.save();
     await newProduct.populate("category", "name");
+    await newProduct.populate("brand", "name");
     res.status(201).json(newProduct);
   } catch (err) {
     console.error("Error creating product:", err);

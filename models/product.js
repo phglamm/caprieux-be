@@ -26,19 +26,18 @@ const ProductSchema = new mongoose.Schema(
       enum: ["male", "female", "unisex"],
       default: "unisex",
     },
-    brand: { type: String, default: "" },
+    brand: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Brand",
+      default: null,
+    },
     condition: {
       type: String,
       enum: ["new", "like_new", "good", "fair"],
       default: "new",
     },
 
-    // ─── Rental Pricing ──────────────────────────────────────────────
-    rentalType: {
-      type: String,
-      enum: ["fixed", "per_day"],
-      required: true,
-    },
+    // ─── Rental Pricing (per day) ───────────────────────────────────
     rentalPrice: { type: Number, required: true },
     depositAmount: { type: Number, default: 0 },
     minRentalDays: { type: Number, default: 1 },

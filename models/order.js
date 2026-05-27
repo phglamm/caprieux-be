@@ -23,6 +23,8 @@ const OrderSchema = new mongoose.Schema(
     ],
     amount: { type: Number, required: true },
     totalDepositAmount: { type: Number, default: 0 },
+    discountAmount: { type: Number, default: 0 },
+    discountRuleName: { type: String, default: "" },
     rentalStartDate: { type: Date },
     rentalEndDate: { type: Date },
     status: {
